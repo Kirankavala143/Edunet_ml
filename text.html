@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeechTrans - Speech Translation</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #f8fafc, #ffffff);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .menu a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .menu a:hover {
+            color: #f39c12;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            color: #0f172a;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: #475569;
+            margin-bottom: 2rem;
+        }
+
+        /* Main Card */
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Button Styles */
+        .start-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            background: #3b82f6;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .start-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        /* Speech Output Section */
+        .speech-container {
+            text-align: left;
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        #speechOutput, #detectedLanguage {
+            font-size: 0.875rem;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Translation Section */
+        .translate-section {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            align-items: flex-end;
+        }
+
+        .translate-section label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 0.5rem;
+        }
+
+        select {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            background-color: white;
+        }
+
+        option {
+            padding: 8px;
+        }
+
+        option:checked {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .translate-btn {
+            padding: 0.625rem 1.5rem;
+            background: #f97316;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .translate-btn:hover {
+            background: #ea580c;
+        }
+
+        #translatedText {
+            background: #fff7ed;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="logo">SpeechTrans</div>
+        <div class="menu">
+            <a href="index.html">Home</a>
+            <a href="aboutus.html">About Us</a>
+            <a href="index.html#contact">Contact</a>
+            <a href="Text.html">Text</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Accurate Speech to Text Translation</h1>
+            <p>Speak, detect language, translate, and listen!</p>
+            <button class="start-btn" onclick="startListening()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+                Start Listening
+            </button>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <!-- Speech Output Section -->
+            <div class="speech-container">
+                <p id="speechOutput">Your speech will appear here...</p>
+                <p id="detectedLanguage"></p>
+            </div>
+
+            <!-- Translation Section -->
+            <div class="translate-section">
+                <div style="flex: 1;">
+                    <label for="languageSelect">Select Translation Language:</label>
+                    <select id="languageSelect">
+                        <option value="en">English</option>
+                        <option value="hi">Hindi</option>
+                        <option value="te">Telugu</option>
+                        <option value="kn">Kannada</option>
+                        <option value="ta">Tamil</option>
+                        <option value="ml">Malayalam</option>
+                        <option value="bn">Bengali</option>
+                    </select>
+                </div>
+                <button class="translate-btn" onclick="translateText()">Translate</button>
+            </div>
+
+            <div id="translatedText"></div>
+        </div>
+    </div>
+
+    <!-- Your existing JavaScript remains unchanged -->
+    <script>
+        let recognizedText = "";
+        let detectedLanguage = "";
+
+        function startListening() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("Your browser doesn't support speech recognition.");
+                return;
+            }
+
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                recognizedText = event.results[0][0].transcript;
+                document.getElementById('speechOutput').textContent = "Recognized: " + recognizedText;
+                detectLanguage(recognizedText);
+            };
+
+            recognition.onerror = function(event) {
+                document.getElementById('speechOutput').textContent = 'Error: ' + event.error;
+            };
+        }
+
+        async function detectLanguage(text) {
+            try {
+                const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`);
+                const result = await response.json();
+                const detectedLang = result[2];
+                document.getElementById('detectedLanguage').textContent = `Detected Language: ${detectedLang}`;
+            } catch (error) {
+                console.error("Error detecting language:", error);
+            }
+        }
+
+        async function detectLanguage(text) {
+    try {
+        const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`);
+        const result = await response.json();
+        detectedLanguage = result[2]; // Store the detected language code
+        document.getElementById('detectedLanguage').textContent = `Detected Language: ${detectedLanguage}`;
+
+        // Set the recognition language to the detected language for better accuracy
+        if (detectedLanguage) {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = detectedLanguage;
+        }
+
+    } catch (error) {
+        console.error("Error detecting language:", error);
+        document.getElementById('detectedLanguage').textContent = "Language Detection Error";
+        detectedLanguage = 'en'; // Default to English if detection fails
+    }
+}
+
+async function translateText() {
+    const targetLanguage = document.getElementById("languageSelect").value;
+
+    // *** KEY CHANGE: Use the detectedLanguage explicitly ***
+    const sourceLanguage = detectedLanguage;  // Use the stored detected language
+    
+    try {
+        const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLanguage}&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(recognizedText)}`);
+        const result = await response.json();
+
+        let translatedText = "";
+        if (result && result[0]) {
+            for (let i = 0; i < result[0].length; i++) {
+                if (result[0][i] && result[0][i][0]) {
+                    translatedText += result[0][i][0];
+                }
+            }
+        }
+
+        document.getElementById("translatedText").textContent = "Translated: " + translatedText;
+        playTextAsSpeech(translatedText, targetLanguage);
+
+    } catch (error) {
+        console.error("Error translating:", error);
+        document.getElementById("translatedText").textContent = "Translation Error: " + error.message;
+    }
+}
+
+        function playTextAsSpeech(text, lang) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>
